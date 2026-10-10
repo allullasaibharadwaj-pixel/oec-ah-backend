@@ -1,0 +1,29 @@
+package com.example.ecommerce.controller;
+
+import com.example.ecommerce.dto.ProfileUpdateRequest;
+import com.example.ecommerce.dto.UserDto;
+import com.example.ecommerce.service.UserService;
+import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @GetMapping("/profile")
+    public UserDto profile(Authentication auth) {
+        return userService.getProfile(auth.getName());
+    }
+
+    @PutMapping("/profile")
+    public UserDto update(Authentication auth, @Valid @RequestBody ProfileUpdateRequest request) {
+        return userService.updateProfile(auth.getName(), request);
+    }
+}
