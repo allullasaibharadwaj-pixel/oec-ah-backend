@@ -1,27 +1,27 @@
-# Stage 1: Build the Spring Boot application
+# Stage 1: Build the application
 FROM maven:3.9-eclipse-temurin-21 AS build
 
 WORKDIR /app
 
-# Copy Maven configuration first
+# Copy Maven configuration
 COPY pom.xml .
 
-# Download dependencies separately so Docker can cache them
-RUN mvn -B -ntp dependency:go-offline
-
-# Copy application source
+# Copy source code
 COPY src ./src
 
 # Build the application
-# Build the application
-RUN mvn -B -ntp -Daether.transport.http.retryHandler.count=5 -Daether.transport.http.retryHandler.interval=10000 -Daether.transport.http.retryHandler.intervalMax=60000 clean package -DskipTests
+RUN mvn -B -ntp clean package -DskipTests
+
 # Stage 2: Run the application
 FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
+# Copy the generated JAR
 COPY --from=build /app/target/*.jar app.jar
 
+# Expose application port
 EXPOSE 8080
 
+# Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
