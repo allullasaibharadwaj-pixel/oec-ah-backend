@@ -14,8 +14,7 @@ COPY src ./src
 
 # Build the application
 # Build the application
-RUN mvn -B -ntp -Dmaven.wagon.http.retryHandler.count=5 clean package -DskipTests
-
+RUN mvn -B -ntp -Daether.transport.http.retryHandler.count=5 -Daether.transport.http.retryHandler.interval=10000 -Daether.transport.http.retryHandler.intervalMax=60000 clean package -DskipTests
 # Stage 2: Run the application
 FROM eclipse-temurin:21-jre
 
