@@ -6,10 +6,11 @@ WORKDIR /app
 # Copy Maven configuration
 COPY pom.xml .
 
-# Copy source code
-COPY src ./src
+# Download dependencies (cached layer)
+RUN mvn -B -ntp dependency:go-offline || true
 
-# Build the application
+# Copy source code and build package
+COPY src ./src
 RUN mvn -B -ntp clean package -DskipTests
 
 # Stage 2: Run the application
@@ -17,7 +18,7 @@ FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-# Copy the generated JAR
+# Copy the generated JAR from the build stage
 COPY --from=build /app/target/*.jar app.jar
 
 # Expose application port
