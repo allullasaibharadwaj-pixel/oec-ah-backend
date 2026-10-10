@@ -13,12 +13,8 @@ RUN mvn -B -ntp dependency:go-offline
 COPY src ./src
 
 # Build the application
-# Build the application with retries for Maven Central rate limits
-RUN for i in 1 2 3 4 5; do 
-    mvn -B -ntp -Dmaven.wagon.http.retryHandler.count=5 clean package -DskipTests && break; 
-    if [ "$i" -eq 5 ]; then exit 1; fi; 
-    sleep $((i * 20)); 
-done
+# Build the application
+RUN mvn -B -ntp -Dmaven.wagon.http.retryHandler.count=5 clean package -DskipTests
 
 # Stage 2: Run the application
 FROM eclipse-temurin:21-jre
